@@ -1,4 +1,5 @@
 import click
+import re
 
 @click.command()
 @click.option('--options', default="hps", help='number of greetings')
@@ -14,9 +15,11 @@ def main(options, function, file):
         getLiveHosts(opts, data)
     if 'search-service' in function.lower():
         term = function.split("=")[1]
-        print term
         printBanner(opts)
         searchServices(opts, term.lower(), data)
+    if 'uniq-services' in function.lower():
+        printBanner(["p","s"])
+        uniqServices(opts, data)
 
 def printFile(data):
     click.echo(data)
@@ -66,9 +69,31 @@ def searchServices(opts, searchTerm, data):
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
                     pair = (line.split("Host: ")[1].split(" ()")[0],l.split('/open/tcp//')[0],l.split('/open/tcp//')[1])
-                    if searchTerm in l.split('/open/tcp//')[1]:
+                    if searchTerm.lower() in pair[2].lower():
                         list1.append(pair)
     printFunction(list1, opts)
+
+def uniqServices(opts, data):
+    all_services = []
+    uniq_services = []
+    uniq = []
+
+    for line in data:
+        if 'Ports: ' in line:
+            for port in line.split("Ports: ")[1].split(", "):
+                if 'open' in port:
+                    if 'Ignored State' in port:
+                        all_services.append("\t"+port.replace("/open/tcp//", ": --------------- \t").replace("\n","").split("\tIgnored State:")[0])
+                    else:
+                        all_services.append("\t"+port.replace("/open/tcp//", ": --------------- \t").replace("\n",""))
+
+
+    uniq = set(all_services)
+    for service in uniq:
+        uniq_services.append(service)
+    uniq_services.sort(key=natural_keys)
+    for service in uniq_services:
+        click.echo(service)
 
 
 def printBanner(options):
@@ -93,6 +118,14 @@ def printBanner(options):
     elif all(o in options for o in ["p"]):
         click.echo("\tPORT")
         click.echo("================================================================================================================")
+
+
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+
+    return [ atoi(c) for c in re.split(':', text) ]
 
 
 if __name__ == '__main__':
