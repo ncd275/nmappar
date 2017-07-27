@@ -11,14 +11,16 @@ def main(options, function, file):
     opts = list(options)
     if function == 'print':
         printFile(data)
-    if function.lower() == 'livehosts':
+    if 'live-host' in function.lower():
         printBanner(opts)
         getLiveHosts(opts, data)
+    if 'dead-host' in function.lower():
+        getDeadHosts(data)
     if 'search-service' in function.lower():
         term = function.split("=")[1]
         printBanner(opts)
         searchServices(opts, term.lower(), data)
-    if 'uniq-services' in function.lower():
+    if 'uniq-service' in function.lower():
         printBanner(["p","s"])
         uniqServices(opts, data)
     if 'search-port' in function.lower():
@@ -50,7 +52,8 @@ def printFunction(portsNservices, options):
             for ps in portsNservices:
                 click.echo("\t"+ps[1]+"\t ------ \t"+ps[2])
         elif all(o in options for o in ["h"]):
-            click.echo("\t"+ps[0])
+            for ps in portsNservices:
+                click.echo("\t"+ps[0])
         elif all(o in options for o in ["s"]):
             for ps in portsNservices:
                 click.echo("\t"+ps[2])
@@ -69,7 +72,10 @@ def getLiveHosts(opts, data):
 
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
-                    pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                    if 'Ignored State' in l:
+                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0]+"\n")
+                    else:
+                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
                     list1.append(pair)
     printFunction(list1, opts)
 def searchServices(opts, searchTerm, data):
@@ -79,9 +85,16 @@ def searchServices(opts, searchTerm, data):
 
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
-                    pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                    if 'Ignored State' in l:
+                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0])
+                    else:
+                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
                     if searchTerm.lower() in pair[2].lower():
                         list1.append(pair)
+    try:
+        list1.sort(key=lambda x: int(x[1]))
+    except:
+        pass
     printFunction(list1, opts)
 
 def searchPorts(opts, ports, data):
@@ -100,6 +113,10 @@ def searchPorts(opts, ports, data):
                     for port in ports:
                         if port.lower() == pair[1].lower():
                             list1.append(pair)
+    try:
+        list1.sort(key=lambda x: int(x[1]))
+    except:
+        pass
     printFunction(list1, opts)
 
 def uniqServices(opts, data):
@@ -112,17 +129,28 @@ def uniqServices(opts, data):
             for port in line.split("Ports: ")[1].split(", "):
                 if 'open' in port:
                     if 'Ignored State' in port:
-                        all_services.append("\t"+port.replace("/open/tcp//", ": --------------- \t").replace("\n","").split("\tIgnored State:")[0])
+                        all_services.append("\t"+re.sub(r"/open/[^\s]*?//", ": --------------- \t",port).replace("\n","").split("\tIgnored State:")[0])
                     else:
-                        all_services.append("\t"+port.replace("/open/tcp//", ": --------------- \t").replace("\n",""))
+                        all_services.append("\t"+re.sub(r"/open/[^\s]*?//", ": --------------- \t",port).replace("\n",""))
 
 
     uniq = set(all_services)
     for service in uniq:
         uniq_services.append(service)
-    uniq_services.sort(key=natural_keys)
+    try:
+        uniq_services.sort(key=lambda x: int(x.split(":")[0]))
+    except:
+        pass
     for service in uniq_services:
         click.echo(service)
+
+
+def getDeadHosts(data):
+    click.echo("\tHOST\t\t\t\tStatus")
+    click.echo("================================================================================================================")
+    for line in data:
+        if 'Status: Down' in line:
+            click.echo("\t"+line.split("Host: ")[1].split(" ()")[0]+'\t------------\t'+line.split("Status: ")[1])
 
 
 def printBanner(options):
@@ -155,6 +183,10 @@ def atoi(text):
 def natural_keys(text):
 
     return [ atoi(c) for c in re.split(':', text) ]
+
+def port_keys(text):
+
+    return [ atoi(c) for c in text[1] ]
 
 
 if __name__ == '__main__':
