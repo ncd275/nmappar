@@ -17,12 +17,26 @@ def main(options, function, file):
     if 'dead-host' in function.lower():
         getDeadHosts(data)
     if 'search-service' in function.lower():
-        term = function.split("=")[1]
+        terms = []
+        termStr = function.split("=")[1]
+        if ',' in termStr:
+            terms = termStr.split(",")
+        else:
+            terms.append(termStr)
         printBanner(opts)
-        searchServices(opts, term.lower(), data)
+        searchServices(opts, terms, data)
     if 'uniq-service' in function.lower():
         printBanner(["p","s"])
         uniqServices(opts, data)
+    if 'search-host' in function.lower():
+        hosts = []
+        hostStr = function.split("=")[1]
+        if ',' in hostStr:
+            hosts = hostStr.split(",")
+        else:
+            hosts.append(hostStr)
+        printBanner(opts)
+        searchHosts(opts, hosts, data)
     if 'search-port' in function.lower():
         portStr = function.split("=")[1]
         ports = []
@@ -78,7 +92,7 @@ def getLiveHosts(opts, data):
                         pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
                     list1.append(pair)
     printFunction(list1, opts)
-def searchServices(opts, searchTerm, data):
+def searchServices(opts, searchTerms, data):
     list1 = []
     for line in data:
         if 'Host:'in line and 'Ports:' in line:
@@ -89,12 +103,37 @@ def searchServices(opts, searchTerm, data):
                         pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0])
                     else:
                         pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
-                    if searchTerm.lower() in pair[2].lower():
-                        list1.append(pair)
+                    for searchTerm in searchTerms:
+                        if searchTerm.lower() in pair[2].lower():
+                            list1.append(pair)
     try:
         list1.sort(key=lambda x: int(x[1]))
     except:
         pass
+    printFunction(list1, opts)
+
+def searchHosts(opts, hosts, data):
+    pair = ''
+    list1 = []
+    for line in data:
+        if 'Host:'in line and 'Ports:' in line:
+
+            for l in line.split("Ports: ")[1].split(", "):
+                if '/open/' in l:
+                    if 'Ignored State' in l:
+                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0]+"\n")
+                    else:
+                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                    for host in hosts:
+                        if '*' in host:
+                            pattern = host.replace(".","\.").replace("*", "(.+)")+"$"
+                            compiled = re.compile(pattern)
+                            if compiled.match(pair[0]):
+                                list1.append(pair)
+                        else:
+                            if host == pair[0]:
+                                list1.append(pair)
+
     printFunction(list1, opts)
 
 def searchPorts(opts, ports, data):
