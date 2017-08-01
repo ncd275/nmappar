@@ -113,6 +113,16 @@ This would return all live hosts and output only the IP address and the port num
 
 
 
+
+# Screenshots
+--------------
+![Alt text](/../screenshots/screenshots/1.png?raw=true)
+![Alt text](/../screenshots/screenshots/2.png?raw=true)
+![Alt text](/../screenshots/screenshots/3.png?raw=true)
+
+
+
+
 # Dependencies
 --------------
 - Tested with Python 2.7.x
