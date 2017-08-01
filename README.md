@@ -13,11 +13,11 @@ python nmappar.py nmap-results.gnmap --options hps --function search-services=ht
 
 
 
-##Functions
+## Functions
 You can use the --function option and then specify which one you would like to use. The functions are listed below:
 
 
-####search-services
+#### search-services
 ------------------
 Example:
 ```js
@@ -29,7 +29,7 @@ This funtion accepts keywords that will be used to search through all the servic
 
 
 
-####search-ports
+#### search-ports
 ------------------
 Example:
 ```js
@@ -41,7 +41,7 @@ This funtion accepts port numbers that will be used to search through all the po
 
 
 
-####search-hosts
+#### search-hosts
 ------------------
 Example:
 ```js
@@ -57,7 +57,7 @@ This funtion will search for hosts. Multiple IPs can be given separated by comma
 
 
 
-####live-hosts
+#### live-hosts
 ------------------
 Example:
 ```js
@@ -69,7 +69,7 @@ This funtion does not accept any parameters and simply returns all hosts with th
 
 
 
-####uniq-services
+#### uniq-services
 ------------------
 Example:
 ```js
@@ -81,7 +81,7 @@ This funtion will return all the unique services in the scan output. Any '--opti
 
 
 
-####dead-hosts
+#### dead-hosts
 ------------------
 Example:
 ```js
@@ -93,7 +93,7 @@ This will just return any hosts with a status of 'Down'. Why would you need this
 
 
 
-##Options
+## Options
 -----------
 
 You can use --options to specify what you would like to output. By default, if no options are specified the functions will return all three.
