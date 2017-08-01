@@ -87,9 +87,9 @@ def getLiveHosts(opts, data):
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
                     if 'Ignored State' in l:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0]+"\n")
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0]+"\n")
                     else:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
                     list1.append(pair)
     printFunction(list1, opts)
 def searchServices(opts, searchTerms, data):
@@ -100,9 +100,9 @@ def searchServices(opts, searchTerms, data):
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
                     if 'Ignored State' in l:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0])
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0])
                     else:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
                     for searchTerm in searchTerms:
                         if searchTerm.lower() in pair[2].lower():
                             list1.append(pair)
@@ -121,9 +121,9 @@ def searchHosts(opts, hosts, data):
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
                     if 'Ignored State' in l:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0]+"\n")
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0]+"\n")
                     else:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
                     for host in hosts:
                         if '*' in host:
                             pattern = host.replace(".","\.").replace("*", "(.+)")+"$"
@@ -145,9 +145,9 @@ def searchPorts(opts, ports, data):
             for l in line.split("Ports: ")[1].split(", "):
                 if '/open/' in l:
                     if 'Ignored State' in l:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0])
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1].split("\tIgnored State:")[0])
                     else:
-                        pair = (line.split("Host: ")[1].split(" ()")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
+                        pair = (line.split("Host: ")[1].split(" (")[0],re.split("/open/[^\s]*?//", l)[0],re.split("/open/[^\s]*?//", l)[1])
 
                     for port in ports:
                         if port.lower() == pair[1].lower():
@@ -189,7 +189,7 @@ def getDeadHosts(data):
     click.echo("================================================================================================================")
     for line in data:
         if 'Status: Down' in line:
-            click.echo("\t"+line.split("Host: ")[1].split(" ()")[0]+'\t------------\t'+line.split("Status: ")[1])
+            click.echo("\t"+line.split("Host: ")[1].split(" (")[0]+'\t------------\t'+line.split("Status: ")[1])
 
 
 def printBanner(options):
