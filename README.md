@@ -113,16 +113,6 @@ This would return all live hosts and output only the IP address and the port num
 
 
 
-
-# Screenshots
---------------
-![Alt text](/../screenshots/screenshots/1.png?raw=true)
-![Alt text](/../screenshots/screenshots/2.png?raw=true)
-![Alt text](/../screenshots/screenshots/3.png?raw=true)
-
-
-
-
 # Dependencies
 --------------
 - Tested with Python 2.7.x
@@ -136,5 +126,3 @@ pip install click
 # Future
 ---------
 I might take out the dependency on Click and use argparse or optparse instead, Not sure. Looking to add a 'compare' function to compare two different nmap files. For example: A scan is ran on the network and two weeks later towards the end of the pentest, the same scan is ran again and the compare function would detect any changes.
-
-Let me know how you use Nmap results and if you would like to see anything added.
