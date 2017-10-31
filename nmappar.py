@@ -1,5 +1,7 @@
 import click
 import re
+import csv
+import sys
 
 
 @click.command()
@@ -47,6 +49,8 @@ def main(options, function, file):
 
         printBanner(opts)
         searchPorts(opts, ports, data)
+    if 'convert-csv' in function.lower():
+        convert_csv(data, file.name)
 
 
 def printFile(data):
@@ -238,5 +242,42 @@ def port_keys(text):
     return [ atoi(c) for c in text[1] ]
 
 
+def convert_csv(input_data, input_file_name):
+    rows = list()
+    output_file =input_file_name.split('.')[0] + '.csv'
+
+    for line in input_data:
+        if '#' not in line:
+            m = re.search('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s([^\)]+)\)', line)
+            host = m.group()
+
+            # grab all open ports after Ports:
+            m = re.search('\d+/.+\t', line)
+            if m:  # if no open ports, re search will be NoneType
+                services = m.group().strip().split('/,')
+
+            else:
+                services = None
+            if services:
+                row = list()
+                row.append(host)
+                for s in services:
+                    service = row + list(filter(lambda x: x != '', s.strip().split('/')))
+                    rows.append(service)
+
+    if rows:
+        with open(output_file, 'wb') as f:
+            fieldnames = ['host', 'port_num', 'state', 'proto', 'service', 'description']
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            for r in rows:
+                writer.writerow(dict(zip(fieldnames, r)))
+                # print host, services
+
+        exit('[+] Done.', output_file)
+    else:
+        exit('[-] Nothing to convert')
+
+
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])  # passing sys.argv[1:] to disable Click from parsing as unicode. (needed for Pycharm to debug)
