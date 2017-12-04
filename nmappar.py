@@ -6,7 +6,7 @@ import sys
 
 @click.command()
 @click.option('--options', default="hps", help='number of greetings')
-@click.option('--function', default="null", help='number of greetings')
+@click.option('--function', default="null", help='search-[services | ports | hosts]=val, uniq-services, [live | dead]-hosts')
 @click.argument('file', type=click.File('rb'))
 def main(options, function, file):
     data = file.readlines()
